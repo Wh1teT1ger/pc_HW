@@ -12,6 +12,8 @@ set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --relocatable-device-code=true")
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -G -lineinfo")
 
+find_package(OpenSSL REQUIRED)
+
 # fetch latest argparse
 include(FetchContent)
 FetchContent_Declare(
@@ -45,7 +47,7 @@ add_executable(nested_hash ${SOURCE_DIR}/main.cu)
 set_target_properties(nested_hash PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
 # Include directories for the main executable
-target_link_libraries(nested_hash PRIVATE sha1 sha256 md5 argparse brute_force)
+target_link_libraries(nested_hash PRIVATE sha1 sha256 md5 argparse brute_force OpenSSL::SSL OpenSSL::Crypto)
 
 # Include directories for the main executable
 target_include_directories(nested_hash PRIVATE ${INCLUDE_DIR})

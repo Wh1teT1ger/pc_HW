@@ -1,15 +1,15 @@
 #include <brute_force.cuh>
 
 void brute_force_gpu(const std::string &charset,
-                     unsigned char *target_hash,
+                     const unsigned char *target_hash,
                      const size_t max_length,
                      const std::vector<int> &hash_types_vec,
-                     std::string &result,
-                     bool &found)
+                     bool &found,
+                     std::string &result)
 {
     int charset_length = charset.length();
     unsigned long long total_candidates = pow(charset_length, max_length);
-    int *hash_types = hash_types_vec.data();
+    const int *hash_types = &hash_types_vec[0];
     int hash_count = hash_types_vec.size();
 
     // CUDA-specific variables
@@ -29,7 +29,7 @@ void brute_force_gpu(const std::string &charset,
     cudaMalloc(&d_result, max_length * sizeof(char));
     cudaMalloc(&d_hash_types, hash_count * sizeof(int));
 
-    cudaMemcpy(d_charset, charset_str.c_str(), charset_length * sizeof(char), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_charset, charset.c_str(), charset_length * sizeof(char), cudaMemcpyHostToDevice);
     cudaMemcpy(d_target, target_hash, 32 * sizeof(unsigned char), cudaMemcpyHostToDevice);
     cudaMemcpy(d_found, &found, sizeof(bool), cudaMemcpyHostToDevice);
     cudaMemcpy(d_hash_types, hash_types, hash_count * sizeof(int), cudaMemcpyHostToDevice);
@@ -59,7 +59,7 @@ void brute_force_gpu(const std::string &charset,
         if (found)
         {
             char result_char[16] = {0};
-            cudaMemcpy(result, d_result, max_length * sizeof(char), cudaMemcpyDeviceToHost);
+            cudaMemcpy(result_char, d_result, max_length * sizeof(char), cudaMemcpyDeviceToHost);
             result = result_char;
             break;
         }
@@ -130,7 +130,7 @@ __global__ void nested_hash_kernel(char *charset,
         }
     }
 
-    if (equls_hash(intermediate, target, max_len))
+    if (equls_hash_gpu(intermediate, target, max_len))
     {
         *found = true;
         for (int i = 0; i < max_len; ++i)
@@ -140,26 +140,35 @@ __global__ void nested_hash_kernel(char *charset,
     }
 }
 
+__device__ bool equls_hash_gpu(const unsigned char *hash1, const unsigned char *hash2, int hash_len)
+{
+    for (int i = 0; i < hash_len; ++i)
+    {
+        if (hash1[i] != hash2[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 void brute_force_cpu(const std::string &charset,
                      const unsigned char *target_hash,
                      size_t max_length,
-                     std::string current,
-                     const std::vector<int> &hash_sequence,
+                     const std::vector<int> &hash_types,
                      bool &found,
-                     std::string &reuslt,
+                     std::string &result,
                      std::string current)
 {
     unsigned char hash[SHA256_DIGEST_LENGTH];
     size_t hash_length;
 
     // Calculate the nested hash for the current combination
-    calculate_nested_hash(current, hash_sequence, hash, hash_length);
+    calculate_nested_hash(current, hash_types, hash, hash_length);
 
     if (equls_hash(hash, target_hash, hash_length))
     {
         found = true;
-        std::cout << current << std::endl;
-        found_word = current;
     }
 
     if (current.size() == max_length)
@@ -171,12 +180,12 @@ void brute_force_cpu(const std::string &charset,
     {
         if (found)
             return; // Stop further generation if a match is found
-        brute_force_cpu(charset, max_length, current + c, hash_sequence, target_hash, found, found_word);
+        brute_force_cpu(charset, target_hash, max_length, hash_types, found, result, current + c);
     }
 }
 
 void calculate_nested_hash(const std::string &input,
-                           const std::vector<int> &hash_sequence,
+                           const std::vector<int> &hash_types,
                            unsigned char *hash,
                            size_t &hash_length)
 {
@@ -187,7 +196,7 @@ void calculate_nested_hash(const std::string &input,
     // Copy the initial input into the current buffer
     memcpy(current_input, input.c_str(), input.size());
 
-    for (int i = 0; i < hash_count; ++i)
+    for (int i = 0; i < hash_types.size(); ++i)
     {
         switch (hash_types[i])
         {
@@ -208,8 +217,8 @@ void calculate_nested_hash(const std::string &input,
     }
 
     // Copy the final hash to the output buffer
-    memcpy(final_hash, intermediate_hash, current_input_len);
-    final_hash_length = current_input_len;
+    memcpy(hash, intermediate_hash, current_input_len);
+    hash_length = current_input_len;
 }
 
 bool equls_hash(const unsigned char *hash1, const unsigned char *hash2, int hash_len)

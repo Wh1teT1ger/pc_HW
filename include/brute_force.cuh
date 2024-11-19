@@ -5,11 +5,12 @@
 #include <openssl/md5.h>
 #include <openssl/sha.h>
 #include <string>
+#include <vector>
 
 void brute_force_gpu(const std::string &charset,
                      const unsigned char *target_hash,
                      const size_t max_length,
-                     const std::vector<int> &hash_types,
+                     const std::vector<int> &hash_types_vec,
                      bool &found,
                      std::string &result);
 
@@ -24,6 +25,8 @@ __global__ void nested_hash_kernel(char *charset,
                                    int *hash_types,
                                    int hash_count);
 
+__device__ bool equls_hash_gpu(const unsigned char *hash1, const unsigned char *hash2, int hash_len);
+
 void brute_force_cpu(const std::string &charset,
                      const unsigned char *target_hash,
                      size_t max_length,
@@ -33,7 +36,7 @@ void brute_force_cpu(const std::string &charset,
                      std::string current);
 
 void calculate_nested_hash(const std::string &input,
-                           const std::vector<std::string> &hash_sequence,
+                           const std::vector<int> &hash_types,
                            unsigned char *hash,
                            size_t &hash_length);
 

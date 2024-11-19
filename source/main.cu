@@ -8,13 +8,13 @@
 int main(int argc, char* argv[]) {
     argparse::ArgumentParser program("brute_force_nested_hashes");
 
-    program.add_argument("-t", "target_hash")
+    program.add_argument("-t", "--target_hash")
         .help("The target hash to brute force")
         .required();
 
-    program.add_argument("-h", "hash_sequence")
+    program.add_argument("-s", "--hash_sequence")
         .help("Sequence of hashes to apply (e.g., md5 sha1 sha256)").
-        nargs(argparse::nargs_pattern::any).
+        nargs(argparse::nargs_pattern::any)
         .required();
 
 
@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
         .help("Character set to use for generating combinations (default: abcdef)")
         .default_value(std::string("abcdefghijklmnopqrstuvwxyz"));
 
-    program.add_argument("-m", "--max-length")
+    program.add_argument("-m", "--max_length")
         .help("Maximum length of combinations (default: 6)")
         .scan<'i', int>()
         .default_value(6);
@@ -43,9 +43,9 @@ int main(int argc, char* argv[]) {
     }
 
     // Parse arguments
-    int max_len = program.get<int>("--max-length");
-    std::string target_hash_hex = program.get<std::string>("-target_hash");
-    std::vector<std::string> hash_sequence = program.get<std::vector<std::string>>("--hash-sequence");
+    int max_len = program.get<int>("--max_length");
+    std::string target_hash_hex = program.get<std::string>("--target_hash");
+    std::vector<std::string> hash_sequence = program.get<std::vector<std::string>>("--hash_sequence");
     std::string charset_str = program.get<std::string>("--charset");
 
     if (max_len > 16) {
@@ -60,14 +60,6 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // Parse hash sequence
-    std::vector<std::string> hash_sequence;
-    std::stringstream ss(hash_sequence_str);
-    std::string token;
-    while (std::getline(ss, token, ',')) {
-        hash_sequence.push_back(token);
-    }
-
     int hash_count = hash_sequence.size();
     std::vector<int> hash_types; // Support up to 3 hash functions
     for (auto &hash : hash_sequence) {
@@ -75,7 +67,7 @@ int main(int argc, char* argv[]) {
         else if (hash == "sha1") hash_types.push_back(1);
         else if (hash == "sha256") hash_types.push_back(2);
         else {
-            std::cerr << "Error: Unsupported hash type: " << hash_sequence[i] << std::endl;
+            std::cerr << "Error: Unsupported hash type: " << hash << std::endl;
             return 1;
         }
     }

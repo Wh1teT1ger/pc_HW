@@ -44,7 +44,7 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps
-.build/
+build/
 
 ### CMake Patch ###
 # External projects
@@ -59,6 +59,7 @@ _deps
 *.fatbin
 
 ### VisualStudioCode ###
+.vscode/
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
