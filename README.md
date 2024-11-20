@@ -51,7 +51,7 @@ Execution time: 32759 ms
 * `target_hash`: Прообраз  хеша (например, `qwerty`).
 * `hash_sequence`: Последовательность хешей (например, `md5 sha1 sha256`).
 ### Пример
-Запуск для хеша `5882f83b17620d005f291df57d46c53f` и композиции `sha256 sha1 md5`:
+Запуск для хеша `5882f83b17620d005f291df57d46c53f` и композиции sha256 → sha1 → md5:
 ```bash
 ./hash -t qwerty -s sha256 sha1 md5
 ```
@@ -61,7 +61,7 @@ Execution time: 32759 ms
 ```
 
 ## Сравнение времени перебора на CPU и GPU
-Сравнение прозводилось на CPU Intel Core i5 6500 и GPU Nvidia gtx 980
+Сравнение прозводительности на CPU Intel Core i5 6500 и GPU Nvidia gtx 980
 
 | Длина слова | CPU       | GPU      |
 |:-----------:|:---------:|:--------:|
