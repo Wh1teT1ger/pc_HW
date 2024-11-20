@@ -71,6 +71,13 @@ int main(int argc, char* argv[]) {
             return 1;
         }
     }
+    std::cout << "Target hash: " << target_hash_hex << std::endl;
+    std::cout << "Hash sequence: ";
+    for (const auto& algo : hash_sequence) {
+        std::cout << algo << " ";
+    }
+    std::cout << std::endl;
+    std::cout << "Start on " << (program["--gpu"] == true ? "gpu..." : "cpu...") << std::endl; 
     // Start timer
     auto start_time = std::chrono::high_resolution_clock::now();
 
