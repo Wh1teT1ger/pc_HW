@@ -6,6 +6,7 @@
 #include <openssl/sha.h>
 #include <string>
 #include <vector>
+#include <iostream>
 
 void brute_force_gpu(const std::string &charset,
                      const unsigned char *target_hash,

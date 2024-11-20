@@ -6,7 +6,7 @@
 #include <chrono>
 
 int main(int argc, char* argv[]) {
-    argparse::ArgumentParser program("brute_force_nested_hashes");
+    argparse::ArgumentParser program("bf_hash");
 
     program.add_argument("-t", "--target_hash")
         .help("The target hash to brute force")
@@ -71,16 +71,15 @@ int main(int argc, char* argv[]) {
             return 1;
         }
     }
-    std::string result = "";
     // Start timer
     auto start_time = std::chrono::high_resolution_clock::now();
 
     bool found  = false;
-    std::string reuslt = "";
+    std::string result = "";
     if (program["--gpu"] == true) {
         brute_force_gpu(charset_str, target_hash, max_len, hash_types, found, result);
     } else {
-        brute_force_cpu(charset_str, target_hash, max_len, hash_types, found, reuslt, "");
+        brute_force_cpu(charset_str, target_hash, max_len, hash_types, found, result, "");
     }
     
     // Stop timer

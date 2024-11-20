@@ -93,19 +93,21 @@ __global__ void nested_hash_kernel(char *charset,
 
     char candidate[16];
     unsigned long long current_idx = idx;
+    int len = 0;
+
     for (int i = 0; i < max_len; ++i)
     {
         candidate[i] = charset[current_idx % charset_length];
         current_idx /= charset_length;
+        if (current_idx == 0) {
+            len = i + 1;
+            break;
+        }
     }
-
-    unsigned char intermediate[32]; // Buffer for intermediate hash resultssource
-    unsigned char md5_hash[16];
-    unsigned char sha1_hash[20];
-    unsigned char sha256_hash[32];
+    unsigned char buffer[32]; // Buffer for intermediate hash resultssource
 
     // Initialize with the candidate
-    memcpy(intermediate, candidate, max_len);
+    memcpy(buffer, candidate, len);
 
     // Apply hash functions in sequence
     for (int i = 0; i < hash_count; ++i)
@@ -113,27 +115,24 @@ __global__ void nested_hash_kernel(char *charset,
         switch (hash_types[i])
         {
         case 0: // MD5
-            compute_md5(intermediate, max_len, md5_hash);
-            memcpy(intermediate, md5_hash, 16);
-            max_len = 16;
+            compute_md5(buffer, len, buffer);
+            len = 16;
             break;
         case 1: // SHA1
-            compute_sha1(intermediate, max_len, sha1_hash);
-            memcpy(intermediate, sha1_hash, 20);
-            max_len = 20;
+            compute_sha1(buffer, len, buffer);
+            len = 20;
             break;
         case 2: // SHA256
-            compute_sha256(intermediate, max_len, sha256_hash);
-            memcpy(intermediate, sha256_hash, 32);
-            max_len = 32;
+            compute_sha256(buffer, len, buffer);
+            len = 32;
             break;
         }
     }
 
-    if (equls_hash_gpu(intermediate, target, max_len))
+    if (equls_hash_gpu(buffer, target, max_len))
     {
         *found = true;
-        for (int i = 0; i < max_len; ++i)
+        for (int i = 0; i < len; ++i)
         {
             result[i] = candidate[i];
         }
@@ -169,6 +168,8 @@ void brute_force_cpu(const std::string &charset,
     if (equls_hash(hash, target_hash, hash_length))
     {
         found = true;
+        result = current;
+        return;
     }
 
     if (current.size() == max_length)

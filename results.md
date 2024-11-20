@@ -21,3 +21,7 @@ Start
 Start chunk 0
 Match found: zzzz
 Execution time: 96 ms
+
+./nested_hash -t 76674e59eaac2e79cb77541da2b29bd11457c906a66b452d6a6a08f2a272775d -s sha256 sha256 sha256 -m 4
+
+./nested_hash -t 9918da8d1bdf61831d0a8460b920975186cdfcba3e5cc881a4ef0e6a3c406c78 -s sha256 sha256 sha256 -m 5

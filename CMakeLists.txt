@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(nested_hash LANGUAGES CXX CUDA)
+project(bf_hash LANGUAGES CXX CUDA)
 
 # Set the C++ standard
 set(CMAKE_CXX_STANDARD 11)
@@ -8,6 +8,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Define directories
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/source)
 set(INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# Add CUDA-specific options
+set(CMAKE_CUDA_ARCHITECTURES 52) # Adjust for your GPU (e.g., 75 for Turing, 80 for Ampere)
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -O3 --use_fast_math")
 
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --relocatable-device-code=true")
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -G -lineinfo")
@@ -43,11 +47,8 @@ target_include_directories(brute_force PUBLIC ${INCLUDE_DIR})
 set_target_properties(brute_force PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
 # Add the main CUDA executable
-add_executable(nested_hash ${SOURCE_DIR}/main.cu)
-set_target_properties(nested_hash PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+add_executable(bf_hash ${SOURCE_DIR}/main.cu)
+set_target_properties(bf_hash PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
 # Include directories for the main executable
-target_link_libraries(nested_hash PRIVATE sha1 sha256 md5 argparse brute_force OpenSSL::SSL OpenSSL::Crypto)
-
-# Include directories for the main executable
-target_include_directories(nested_hash PRIVATE ${INCLUDE_DIR})
+target_link_libraries(bf_hash PRIVATE sha1 sha256 md5 argparse brute_force OpenSSL::SSL OpenSSL::Crypto)
