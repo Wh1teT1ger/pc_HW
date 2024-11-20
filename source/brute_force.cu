@@ -237,10 +237,7 @@ bool equls_hash(const unsigned char *hash1, const unsigned char *hash2, int hash
 // Convert hex string to byte array
 bool hex_to_bytes(const std::string &hex, unsigned char *bytes, int expected_length)
 {
-    if (hex.length() != expected_length * 2)
-    {
-        return false;
-    }
+
     for (size_t i = 0; i < expected_length; ++i)
     {
         std::string byte_str = hex.substr(i * 2, 2);

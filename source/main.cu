@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 
     // Convert target hash from hex to bytes
     unsigned char target_hash[32];
-    if (!hex_to_bytes(target_hash_hex, target_hash, 32)) {
+    if (!hex_to_bytes(target_hash_hex, target_hash, target_hash_hex.size() / 2)) {
         std::cerr << "Error: Invalid target hash format." << std::endl;
         return 1;
     }

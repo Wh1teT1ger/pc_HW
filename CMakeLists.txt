@@ -50,5 +50,10 @@ set_target_properties(brute_force PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 add_executable(bf_hash ${SOURCE_DIR}/main.cu)
 set_target_properties(bf_hash PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
+add_executable(hash ${SOURCE_DIR}/hash.cpp)
+set_target_properties(bf_hash PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+
 # Include directories for the main executable
 target_link_libraries(bf_hash PRIVATE sha1 sha256 md5 argparse brute_force OpenSSL::SSL OpenSSL::Crypto)
+
+target_link_libraries(hash PRIVATE argparse OpenSSL::SSL OpenSSL::Crypto)
