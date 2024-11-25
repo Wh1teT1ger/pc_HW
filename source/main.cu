@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
 
 
     program.add_argument("-c", "--charset")
-        .help("Character set to use for generating combinations (default: abcdef)")
+        .help("Character set to use for generating combinations (default: abcdefghijklmnopqrstuvwxyz)")
         .default_value(std::string("abcdefghijklmnopqrstuvwxyz"));
 
     program.add_argument("-m", "--max_length")
